@@ -190,11 +190,11 @@ namespace nickmaltbie.OpenKCC.Tests.PlayMode.Utils
             bool canPush = !isKinematic && rigidbody != null && pushable.GetComponent<Pushable>() != null;
             if (canPush && rigidbody != null)
             {
-                Assert.IsTrue(rigidbody.velocity.magnitude >= 0, $"Expected box to have some added force");
+                Assert.IsTrue(rigidbody.linearVelocity.magnitude >= 0, $"Expected box to have some added force");
             }
             else if (rigidbody != null)
             {
-                Assert.IsTrue(rigidbody.velocity.magnitude == 0, $"Expected box to not have any added force");
+                Assert.IsTrue(rigidbody.linearVelocity.magnitude == 0, $"Expected box to not have any added force");
             }
         }
 

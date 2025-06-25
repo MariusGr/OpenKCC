@@ -55,7 +55,7 @@ namespace nickmaltbie.OpenKCC.Tests.EditMode.Environment
             platform.FixedUpdate();
             Assert.IsNull(platform.CurrentTarget);
             Assert.AreEqual(platform.currentTargetIndex, 0);
-            TestUtils.AssertInBounds(rb.velocity, Vector3.zero);
+            TestUtils.AssertInBounds(rb.linearVelocity, Vector3.zero);
         }
 
         [Test]

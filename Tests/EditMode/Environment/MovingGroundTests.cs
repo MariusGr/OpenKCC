@@ -277,7 +277,7 @@ namespace nickmaltbie.OpenKCC.Tests.EditMode.Environment
             {
                 rb.position = monoBehaviour.transform.position;
                 rb.rotation = monoBehaviour.transform.rotation;
-                rb.velocity = move / deltaTime;
+                rb.linearVelocity = move / deltaTime;
                 rb.angularVelocity = rotate * Mathf.Deg2Rad / deltaTime;
             }
 
