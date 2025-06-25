@@ -87,6 +87,13 @@ namespace nickmaltbie.OpenKCC.Character
         public float jumpVelocity = 6.5f;
 
         /// <summary>
+        /// Cooldown time for jumping.
+        /// </summary>
+        [Tooltip("Cooldown time for jumping.")]
+        [SerializeField]
+        public float jumpCooldown = 0.25f;
+
+        /// <summary>
         /// Action reference for jumping.
         /// </summary>
         internal JumpAction jumpAction;
@@ -256,7 +263,7 @@ namespace nickmaltbie.OpenKCC.Character
                 jumpInput = new Input.BufferedInput()
                 {
                     inputActionReference = jumpActionReference,
-                    cooldown = 0.25f,
+                    cooldown = jumpCooldown,
                     bufferTime = 0.05f,
                 },
                 jumpVelocity = jumpVelocity,
