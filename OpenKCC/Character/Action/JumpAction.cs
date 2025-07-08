@@ -64,6 +64,18 @@ namespace nickmaltbie.OpenKCC.Character.Action
         public float jumpAngleWeightFactor = 0.0f;
 
         /// <summary>
+        /// Cooldown time between jumps in seconds.
+        /// </summary>
+        [Tooltip("Cooldown time between jumps in seconds.")]
+        [SerializeField]
+        public float jumpCooldown = 1f;
+
+        /// <summary>
+        /// Time when the last jump occurred.
+        /// </summary>
+        private float lastJumpTime = -Mathf.Infinity;
+
+        /// <summary>
         /// Grounded state for managing player grounded configuration.
         /// </summary>
         private IKCCGrounded kccGrounded;
@@ -141,6 +153,7 @@ namespace nickmaltbie.OpenKCC.Character.Action
                 jumpAngleWeightFactor + kccConfig.Up * (1 - jumpAngleWeightFactor);
             actor.ApplyJump(jumpVelocity * jumpDirection.normalized);
             jumpInput.Reset();
+            lastJumpTime = Time.time;
         }
 
         /// <summary>
@@ -154,6 +167,11 @@ namespace nickmaltbie.OpenKCC.Character.Action
         /// <returns>True if the player can jump, false otherwise.</returns>
         public bool CanJump()
         {
+            // Check for jump cooldown
+            if (Time.time - lastJumpTime < jumpCooldown)
+            {
+                return false;
+            }
             bool canJump = kccGrounded.StandingOnGround && kccGrounded.Angle <= maxJumpAngle;
             if (canJump && !kccGrounded.Sliding)
             {

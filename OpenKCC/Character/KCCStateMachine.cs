@@ -263,10 +263,11 @@ namespace nickmaltbie.OpenKCC.Character
                 jumpInput = new Input.BufferedInput()
                 {
                     inputActionReference = jumpActionReference,
-                    cooldown = jumpCooldown,
+                    cooldown = .25f,
                     bufferTime = 0.05f,
                 },
                 jumpVelocity = jumpVelocity,
+                jumpCooldown = jumpCooldown,
                 maxJumpAngle = 85.0f,
                 jumpAngleWeightFactor = 0.0f,
             };
