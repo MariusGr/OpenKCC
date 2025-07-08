@@ -79,7 +79,7 @@ namespace nickmaltbie.OpenKCC.Input
         private float elapsedSincePressed = Mathf.Infinity;
 
         /// <summary>
-        /// Amount fo elapsed time since the input was reset.
+        /// Amount of elapsed time since the input was reset.
         /// </summary>
         private float elapsedSinceReset = Mathf.Infinity;
 
