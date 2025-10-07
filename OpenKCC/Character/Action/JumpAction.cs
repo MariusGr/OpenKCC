@@ -70,6 +70,13 @@ namespace nickmaltbie.OpenKCC.Character.Action
         [SerializeField]
         public float jumpCooldown = 1f;
 
+        [Tooltip("Require jump key to be released before jumping again.")]
+        [SerializeField]
+        public bool requireJumpRelease;
+
+        // Tracks if jump key was released since last jump
+        private bool jumpReleasedSinceLastJump = true;
+
         /// <summary>
         /// Time when the last jump occurred.
         /// </summary>
@@ -129,13 +136,15 @@ namespace nickmaltbie.OpenKCC.Character.Action
         public bool ApplyJumpIfPossible(IKCCGrounded grounded)
         {
             kccGrounded = grounded;
+            bool jumpPressed = jumpInput.InputAction?.IsPressed() ?? false;
 
-            if (AttemptingJump && CanPerform)
+            if (jumpReleasedSinceLastJump && AttemptingJump && CanPerform && jumpPressed)
             {
                 Jump();
                 return true;
             }
 
+            jumpReleasedSinceLastJump = !requireJumpRelease || !jumpPressed;
             return false;
         }
 

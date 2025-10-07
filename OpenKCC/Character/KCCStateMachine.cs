@@ -268,6 +268,7 @@ namespace nickmaltbie.OpenKCC.Character
                 },
                 jumpVelocity = jumpVelocity,
                 jumpCooldown = jumpCooldown,
+                requireJumpRelease = true,
                 maxJumpAngle = 85.0f,
                 jumpAngleWeightFactor = 0.0f,
             };
