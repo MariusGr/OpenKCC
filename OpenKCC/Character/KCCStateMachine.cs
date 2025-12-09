@@ -123,7 +123,9 @@ namespace nickmaltbie.OpenKCC.Character
         /// </summary>
         public InputAction MoveAction
         {
-            get => overrideMoveAction ?? moveActionReference?.action;
+            get => (overrideMoveAction == null || overrideMoveAction.bindings.Count == 0)
+                        ? (moveActionReference != null ? moveActionReference.action : null)
+                        : overrideMoveAction;
             set => overrideMoveAction = value;
         }
 
@@ -132,7 +134,7 @@ namespace nickmaltbie.OpenKCC.Character
         /// </summary>
         public InputAction SprintAction
         {
-            get => overrideSprintAction ?? sprintActionReference?.action;
+            get => overrideSprintAction ?? (sprintActionReference != null ? sprintActionReference.action : null);
             set => overrideSprintAction = value;
         }
 
