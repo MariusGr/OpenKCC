@@ -131,10 +131,13 @@ namespace nickmaltbie.OpenKCC.Character
 
         /// <summary>
         /// Gets the move action associated with this kcc.
+        /// Gets the sprint action associated with this kcc.
         /// </summary>
         public InputAction SprintAction
         {
-            get => overrideSprintAction ?? (sprintActionReference != null ? sprintActionReference.action : null);
+            get => (overrideSprintAction == null || overrideSprintAction.bindings.Count == 0)
+                ? (sprintActionReference != null ? sprintActionReference.action : null)
+                : overrideSprintAction;
             set => overrideSprintAction = value;
         }
 
