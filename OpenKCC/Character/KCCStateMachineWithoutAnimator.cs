@@ -32,6 +32,14 @@ using static nickmaltbie.OpenKCC.Character.Animation.HumanoidKCCAnim;
 
 namespace nickmaltbie.OpenKCC.Character
 {
+    public enum Stance
+    {
+        None = -1,
+        Standing = 0,
+        Crouching = 1,
+        Prone = 2
+    }
+
     /// <summary>
     /// Have a character controller push any dynamic rigidbody it hits
     /// </summary>
@@ -40,6 +48,9 @@ namespace nickmaltbie.OpenKCC.Character
     [DefaultExecutionOrder(1000)]
     public class KCCStateMachineWithoutAnimator : FixedSMBehaviour, IJumping
     {
+        [HideInInspector] public Stance CurrentStance = Stance.Standing;
+        [HideInInspector] public bool IsAiming = false;
+
         [Header("Input Controls")]
 
         /// <summary>
@@ -219,6 +230,39 @@ namespace nickmaltbie.OpenKCC.Character
         public class SprintingState : State { }
 
         /// <summary>
+        /// Aiming state for KCC state machine when player is aiming down sights.
+        /// </summary>
+        [Animation(IdleAnimState, 0.1f, true)]
+        [Transition(typeof(JumpEvent), typeof(JumpState))]
+        [Transition(typeof(StopMoveInput), typeof(IdleState))]
+        [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
+        [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
+        [MovementSettings(SpeedConfig = nameof(walkingSpeed))]
+        public class AimingState : State { }
+
+        /// <summary>
+        /// Crouching state for KCC state machine when player is crouched.
+        /// </summary>
+        [Animation(IdleAnimState, 0.1f, true)]
+        [Transition(typeof(JumpEvent), typeof(JumpState))]
+        [Transition(typeof(StopMoveInput), typeof(IdleState))]
+        [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
+        [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
+        [MovementSettings(SpeedConfig = nameof(walkingSpeed))]
+        public class CrouchingState : State { }
+
+        /// <summary>
+        /// Prone state for KCC state machine when player is lying down.
+        /// </summary>
+        [Animation(IdleAnimState, 0.1f, true)]
+        [Transition(typeof(JumpEvent), typeof(JumpState))]
+        [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
+        [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
+        [MovementSettings(SpeedConfig = nameof(walkingSpeed))]
+        public class ProneState : State { }
+
+
+        /// <summary>
         /// Sliding state for KCC state machine for when the player
         /// is moving along a sloped surface too step to walk up.
         /// </summary>
@@ -349,7 +393,7 @@ namespace nickmaltbie.OpenKCC.Character
         {
             Vector3 rotatedMovement = HorizPlaneView * InputMovement;
             Vector3 projectedMovement = movementEngine.GetProjectedMovement(rotatedMovement);
-            float speed = MovementSettingsAttribute.GetSpeed(CurrentState, this);
+            float speed = MovementSettingsAttribute.GetSpeed(CurrentState, this) * (IsAiming ? 0.5f : 1.0f);
             Vector3 scaledMovement = projectedMovement * speed;
             return scaledMovement;
         }
@@ -388,6 +432,8 @@ namespace nickmaltbie.OpenKCC.Character
 
             bool movingForward = Vector3.Dot(InputMovement.normalized, Vector3.forward) > 0.1f;
 
+            if (!moving) return;
+
             if (movingForward)
             {
                 if (SprintAction?.IsPressed() ?? false)
@@ -397,6 +443,22 @@ namespace nickmaltbie.OpenKCC.Character
                 else
                 {
                     RaiseEvent(StopSprintEvent.Instance);
+                }
+            }
+            else
+            {
+                RaiseEvent(StopSprintEvent.Instance);
+                switch (CurrentStance)
+                {
+                    case Stance.Standing:
+                        // No action needed
+                        break;
+                    case Stance.Crouching:
+                        RaiseEvent(StartCrouchEvent.Instance);
+                        break;
+                    case Stance.Prone:
+                        RaiseEvent(StartProneEvent.Instance);
+                        break;
                 }
             }
         }

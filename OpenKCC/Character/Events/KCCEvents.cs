@@ -51,6 +51,66 @@ namespace nickmaltbie.OpenKCC.Character.Events
     }
 
     /// <summary>
+    /// Event when the player starts aiming.
+    /// </summary>
+    public class StartAimEvent : IEvent
+    {
+        public static readonly StartAimEvent Instance = new StartAimEvent();
+
+        private StartAimEvent() { }
+    }
+
+    /// <summary>
+    /// Event when the player stops aiming.
+    /// </summary>
+    public class StopAimEvent : IEvent
+    {
+        public static readonly StopAimEvent Instance = new StopAimEvent();
+
+        private StopAimEvent() { }
+    }
+
+    /// <summary>
+    /// Event when the player starts crouching.
+    /// </summary>
+    public class StartCrouchEvent : IEvent
+    {
+        public static readonly StartCrouchEvent Instance = new StartCrouchEvent();
+
+        private StartCrouchEvent() { }
+    }
+
+    /// <summary>
+    /// Event when the player stops crouching.
+    /// </summary>
+    public class StopCrouchEvent : IEvent
+    {
+        public static readonly StopCrouchEvent Instance = new StopCrouchEvent();
+
+        private StopCrouchEvent() { }
+    }
+
+    /// <summary>
+    /// Event when the player starts prone.
+    /// </summary>
+    public class StartProneEvent : IEvent
+    {
+        public static readonly StartProneEvent Instance = new StartProneEvent();
+
+        private StartProneEvent() { }
+    }
+
+    /// <summary>
+    /// Event when the player stops prone.
+    /// </summary>
+    public class StopProneEvent : IEvent
+    {
+        public static readonly StopProneEvent Instance = new StopProneEvent();
+
+        private StopProneEvent() { }
+    }
+
+    /// <summary>
     /// Event when the player steps off the ground.
     /// </summary>
     public class LeaveGroundEvent : IEvent
