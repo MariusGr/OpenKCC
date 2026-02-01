@@ -386,7 +386,9 @@ namespace nickmaltbie.OpenKCC.Character
             IEvent moveEvent = moving ? StartMoveInput.Instance as IEvent : StopMoveInput.Instance as IEvent;
             RaiseEvent(moveEvent);
 
-            if (moving)
+            bool movingForward = Vector3.Dot(InputMovement.normalized, Vector3.forward) > 0.1f;
+
+            if (movingForward)
             {
                 if (SprintAction?.IsPressed() ?? false)
                 {
