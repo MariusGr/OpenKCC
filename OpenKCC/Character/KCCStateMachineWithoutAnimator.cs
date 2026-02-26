@@ -352,9 +352,6 @@ namespace nickmaltbie.OpenKCC.Character
         {
             GetComponent<Rigidbody>().isKinematic = true;
             jumpAction.ApplyJumpIfPossible(movementEngine.GroundedState);
-            movementEngine.MovePlayer(
-                GetDesiredMovement() * unityService.fixedDeltaTime,
-                Velocity * unityService.fixedDeltaTime);
             UpdateGroundedState();
 
             // Apply gravity if needed
@@ -375,6 +372,9 @@ namespace nickmaltbie.OpenKCC.Character
         {
             ReadPlayerMovement();
             base.Update();
+            movementEngine.MovePlayer(
+                GetDesiredMovement() * unityService.deltaTime,
+                Velocity * unityService.deltaTime);
         }
 
         /// <inheritdoc/>
