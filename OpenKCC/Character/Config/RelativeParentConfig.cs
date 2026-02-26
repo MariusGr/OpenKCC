@@ -143,7 +143,7 @@ namespace nickmaltbie.OpenKCC.Character.Config
         {
             if (OnMovingGround)
             {
-                return (PreviousParent.position + PreviousParent.rotation * RelativePos) - position;
+                return PreviousParent.position + PreviousParent.rotation * RelativePos - position;
             }
 
             return Vector3.zero;
