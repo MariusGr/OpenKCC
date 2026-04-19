@@ -179,6 +179,7 @@ namespace nickmaltbie.OpenKCC.Character
         /// </summary>
         [InitialState]
         [Transition(typeof(StartMoveInput), typeof(WalkingState))]
+        [Transition(typeof(StartProneEvent), typeof(ProneState))]
         [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
         [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
         [Transition(typeof(JumpEvent), typeof(JumpState))]
@@ -214,6 +215,8 @@ namespace nickmaltbie.OpenKCC.Character
         [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
         [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
         [Transition(typeof(StartSprintEvent), typeof(SprintingState))]
+        [Transition(typeof(StartCrouchEvent), typeof(CrouchingState))]
+        [Transition(typeof(StartProneEvent), typeof(ProneState))]
         [MovementSettings(SpeedConfig = nameof(walkingSpeed))]
         public class WalkingState : State { }
 
@@ -237,6 +240,8 @@ namespace nickmaltbie.OpenKCC.Character
         [Transition(typeof(StopMoveInput), typeof(IdleState))]
         [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
         [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
+        [Transition(typeof(StartCrouchEvent), typeof(CrouchingState))]
+        [Transition(typeof(StartProneEvent), typeof(ProneState))]
         [MovementSettings(SpeedConfig = nameof(walkingSpeed))]
         public class AimingState : State { }
 
@@ -244,17 +249,27 @@ namespace nickmaltbie.OpenKCC.Character
         /// Crouching state for KCC state machine when player is crouched.
         /// </summary>
         [Animation(IdleAnimState, 0.1f, true)]
+        [Transition(typeof(StopCrouchEvent), typeof(IdleState))]
+        [Transition(typeof(StartProneEvent), typeof(ProneState))]
         [Transition(typeof(JumpEvent), typeof(JumpState))]
         [Transition(typeof(StopMoveInput), typeof(IdleState))]
         [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
         [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
-        [MovementSettings(SpeedConfig = nameof(walkingSpeed))]
+        [MovementSettings(SpeedConfig = nameof(crouchSpeed))]
         public class CrouchingState : State { }
+        /// <summary>
+        /// Speed of player movement when crouching.
+        /// </summary>
+        [Tooltip("Speed of player when crouching")]
+        [SerializeField]
+        public float crouchSpeed = 4.5f;
 
         /// <summary>
         /// Prone state for KCC state machine when player is lying down.
         /// </summary>
         [Animation(IdleAnimState, 0.1f, true)]
+        [Transition(typeof(StopProneEvent), typeof(IdleState))]
+        [Transition(typeof(StartCrouchEvent), typeof(CrouchingState))]
         [Transition(typeof(JumpEvent), typeof(JumpState))]
         [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
         [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
@@ -432,34 +447,30 @@ namespace nickmaltbie.OpenKCC.Character
 
             bool movingForward = Vector3.Dot(InputMovement.normalized, Vector3.forward) > 0.1f;
 
-            if (!moving) return;
-
-            if (movingForward)
+            bool canSprint = moving && movingForward && CurrentStance == Stance.Standing;
+            if (canSprint && (SprintAction?.IsPressed() ?? false))
             {
-                if (SprintAction?.IsPressed() ?? false)
-                {
-                    RaiseEvent(StartSprintEvent.Instance);
-                }
-                else
-                {
-                    RaiseEvent(StopSprintEvent.Instance);
-                }
+                RaiseEvent(StartSprintEvent.Instance);
             }
             else
             {
                 RaiseEvent(StopSprintEvent.Instance);
-                switch (CurrentStance)
-                {
-                    case Stance.Standing:
-                        // No action needed
-                        break;
-                    case Stance.Crouching:
-                        RaiseEvent(StartCrouchEvent.Instance);
-                        break;
-                    case Stance.Prone:
-                        RaiseEvent(StartProneEvent.Instance);
-                        break;
-                }
+            }
+
+            switch (CurrentStance)
+            {
+                case Stance.Standing:
+                    RaiseEvent(StopCrouchEvent.Instance);
+                    RaiseEvent(StopProneEvent.Instance);
+                    break;
+                case Stance.Crouching:
+                    RaiseEvent(StartCrouchEvent.Instance);
+                    RaiseEvent(StopProneEvent.Instance);
+                    break;
+                case Stance.Prone:
+                    RaiseEvent(StartProneEvent.Instance);
+                    RaiseEvent(StopCrouchEvent.Instance);
+                    break;
             }
         }
     }
