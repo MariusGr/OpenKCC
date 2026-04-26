@@ -302,6 +302,9 @@ namespace nickmaltbie.OpenKCC.Character
         /// <param name="moves">Desired player movement in world space.</param>
         public virtual KCCBounce[] MovePlayer(params Vector3[] moves)
         {
+            // Ensure physics queries see latest moved transforms (animated/moved colliders).
+            if (!Physics.autoSyncTransforms) Physics.SyncTransforms();
+
             RelativeParentConfig.FollowGround(transform);
             Vector3 previousVelocity = (transform.position - previousPosition) / unityService.deltaTime;
             worldVelocity.AddSample(previousVelocity);
