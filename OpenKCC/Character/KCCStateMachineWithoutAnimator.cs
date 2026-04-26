@@ -51,6 +51,16 @@ namespace nickmaltbie.OpenKCC.Character
         [HideInInspector] public Stance CurrentStance = Stance.Standing;
         [HideInInspector] public bool IsAiming = false;
 
+        [Header("Input Mode")]
+
+        /// <summary>
+        /// Should this state machine read movement and sprint from InputActionReferences.
+        /// Disable this for AI/NPC characters and drive them through SetExternalInput.
+        /// </summary>
+        [Tooltip("Read movement/sprint from InputActionReferences. Disable for AI controlled characters.")]
+        [SerializeField]
+        public bool useInputActions = true;
+
         [Header("Input Controls")]
 
         /// <summary>
@@ -161,6 +171,16 @@ namespace nickmaltbie.OpenKCC.Character
         /// Input movement from player input updated each frame.
         /// </summary>
         public Vector3 InputMovement { get; private set; }
+
+        /// <summary>
+        /// External movement input used when useInputActions is false.
+        /// </summary>
+        protected Vector2 externalMoveInput = Vector2.zero;
+
+        /// <summary>
+        /// External sprint input used when useInputActions is false.
+        /// </summary>
+        protected bool externalSprintPressed;
 
         /// <summary>
         /// Get the camera controls associated with the state machine.
@@ -366,7 +386,30 @@ namespace nickmaltbie.OpenKCC.Character
         public void SetupInputs()
         {
             jumpAction?.Setup(movementEngine.GroundedState, movementEngine, this);
-            MoveAction?.Enable();
+            if (useInputActions)
+            {
+                MoveAction?.Enable();
+                SprintAction?.Enable();
+            }
+        }
+
+        /// <summary>
+        /// Provide movement and sprint input from external systems (for example AI controllers).
+        /// This is only used when useInputActions is false.
+        /// </summary>
+        public void SetExternalInput(Vector2 movement, bool sprintPressed)
+        {
+            externalMoveInput = Vector2.ClampMagnitude(movement, 1f);
+            externalSprintPressed = sprintPressed;
+        }
+
+        /// <summary>
+        /// Clear any externally provided input.
+        /// </summary>
+        public void ClearExternalInput()
+        {
+            externalMoveInput = Vector2.zero;
+            externalSprintPressed = false;
         }
 
         /// <inheritdoc/>
@@ -434,8 +477,21 @@ namespace nickmaltbie.OpenKCC.Character
         /// </summary>
         public void ReadPlayerMovement()
         {
-            bool denyMovement = PlayerInputUtils.playerMovementState == PlayerInputState.Deny;
-            Vector2 moveVector = denyMovement ? Vector2.zero : MoveAction?.ReadValue<Vector2>() ?? Vector2.zero;
+            Vector2 moveVector;
+            bool sprintPressed;
+
+            if (useInputActions)
+            {
+                bool denyMovement = PlayerInputUtils.playerMovementState == PlayerInputState.Deny;
+                moveVector = denyMovement ? Vector2.zero : MoveAction?.ReadValue<Vector2>() ?? Vector2.zero;
+                sprintPressed = !denyMovement && (SprintAction?.IsPressed() ?? false);
+            }
+            else
+            {
+                moveVector = externalMoveInput;
+                sprintPressed = externalSprintPressed;
+            }
+
             InputMovement = new Vector3(moveVector.x, 0, moveVector.y);
             jumpAction.Update();
 
@@ -455,7 +511,7 @@ namespace nickmaltbie.OpenKCC.Character
             bool movingForward = Vector3.Dot(InputMovement.normalized, Vector3.forward) > 0.1f;
 
             bool canSprint = moving && movingForward && CurrentStance == Stance.Standing;
-            if (canSprint && (SprintAction?.IsPressed() ?? false))
+            if (canSprint && sprintPressed)
             {
                 RaiseEvent(StartSprintEvent.Instance);
             }
