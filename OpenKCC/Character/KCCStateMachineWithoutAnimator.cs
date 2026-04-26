@@ -179,6 +179,7 @@ namespace nickmaltbie.OpenKCC.Character
         /// </summary>
         [InitialState]
         [Transition(typeof(StartMoveInput), typeof(WalkingState))]
+        [Transition(typeof(StartCrouchEvent), typeof(CrouchingState))]
         [Transition(typeof(StartProneEvent), typeof(ProneState))]
         [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
         [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
@@ -273,9 +274,15 @@ namespace nickmaltbie.OpenKCC.Character
         [Transition(typeof(JumpEvent), typeof(JumpState))]
         [Transition(typeof(LeaveGroundEvent), typeof(FallingState))]
         [Transition(typeof(SteepSlopeEvent), typeof(SlidingState))]
-        [MovementSettings(SpeedConfig = nameof(walkingSpeed))]
+        [MovementSettings(SpeedConfig = nameof(proneSpeed))]
         public class ProneState : State { }
 
+        /// <summary>
+        /// Speed of player movement when prone.
+        /// </summary>
+        [Tooltip("Speed of player when prone")]
+        [SerializeField]
+        public float proneSpeed = 2.5f;
 
         /// <summary>
         /// Sliding state for KCC state machine for when the player
